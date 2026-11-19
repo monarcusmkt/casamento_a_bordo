@@ -4,6 +4,7 @@ import { createReadStream, existsSync } from 'node:fs';
 import { join, resolve, extname } from 'node:path';
 import { randomUUID, randomBytes, scryptSync, timingSafeEqual, createHash } from 'node:crypto';
 import pg from 'pg';
+import sanitizeHtml from 'sanitize-html';
 
 const { Pool } = pg;
 if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL obrigatória');
@@ -63,7 +64,7 @@ const getUser = async req => {
 };
 const postFields = body => {
  const title=String(body.title||'').trim(), slug=String(body.slug||'').trim();
- const content=String(body.content||'');
+ const content=sanitizeHtml(String(body.content||''),{allowedTags:['p','br','h2','h3','strong','em','u','s','blockquote','ol','ul','li','a','img'],allowedAttributes:{a:['href','target','rel'],img:['src','alt']},allowedSchemes:['https','http'],allowedSchemesByTag:{img:['https','http']}});
  if (!title || title.length>200 || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slug.length>220 || !content || content.length>100000)
  throw Object.assign(new Error('Título, slug ou conteúdo inválidos'),{status:400});
  return [title,slug,content,String(body.excerpt||'').slice(0,500),String(body.cover_image||'').slice(0,1000),
