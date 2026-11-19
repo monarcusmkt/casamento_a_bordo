@@ -1,16 +1,18 @@
 FROM node:24-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN npm install --package-lock-only --ignore-scripts && npm ci
 COPY . .
-ARG VITE_SUPABASE_URL
-ARG VITE_SUPABASE_ANON_KEY
-ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
-ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
 RUN npm run build
 
-FROM nginx:alpine
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/dist /usr/share/nginx/html
+FROM node:24-alpine
+ENV NODE_ENV=production PORT=80
+WORKDIR /app
+COPY --from=build /app/package*.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+COPY --from=build /app/dist ./dist
+COPY server ./server
+RUN mkdir -p /data/uploads && chown -R node:node /app /data/uploads
+USER node
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["node","server/index.mjs"]
