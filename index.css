@@ -1,0 +1,233 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Lato:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Charcoal luxury palette */
+    --background: 180 3% 99%;
+    --foreground: 180 3% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 180 3% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 180 3% 10%;
+
+    /* Charcoal primary */
+    --primary: 180 3% 25%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Burgundy secondary */
+    --secondary: 350 67% 34%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Pearl white muted (Cleaner) */
+    --muted: 180 3% 96%;
+    --muted-foreground: 180 3% 45%;
+
+    /* Burgundy accent */
+    --accent: 350 67% 34%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 180 3% 98%;
+
+    --border: 180 3% 92%;
+    --input: 180 3% 92%;
+    --ring: 180 3% 25%;
+
+    --radius: 1rem;
+
+    /* Custom semantic tokens */
+    --ocean-deep: 180 3% 20%;
+    --ocean-light: 180 3% 88%;
+    --coral: 350 67% 34%;
+    --coral-light: 350 67% 94%;
+    --gold: 350 67% 34%;
+    --gold-light: 350 67% 88%;
+    --pearl: 180 3% 99%;
+    --navy: 180 3% 26%;
+
+    /* Gradients (Smoother) */
+    --gradient-ocean: linear-gradient(135deg, hsl(180 3% 25%) 0%, hsl(180 3% 35%) 100%);
+    --gradient-sunset: linear-gradient(135deg, hsl(350 67% 34%) 0%, hsl(350 50% 50%) 100%);
+    --gradient-pearl: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(180 3% 97%) 100%);
+    --gradient-hero: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.5) 100%);
+    --gradient-cta: linear-gradient(135deg, hsl(180 3% 25%) 0%, hsl(180 3% 15%) 100%);
+
+    /* Shadows (More subtle) */
+    --shadow-soft: 0 8px 30px -4px hsl(180 3% 25% / 0.08);
+    --shadow-elevated: 0 20px 50px -12px hsl(180 3% 25% / 0.12);
+    --shadow-gold: 0 8px 32px -4px hsl(350 67% 34% / 0.2);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth antialiased;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display tracking-tight;
+  }
+}
+
+@layer components {
+  .section-padding {
+    @apply px-4 sm:px-6 lg:px-8 py-12 md:py-20;
+  }
+
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6;
+  }
+
+  .text-gradient-ocean {
+    background: var(--gradient-ocean);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-sunset {
+    background: var(--gradient-sunset);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-gradient-ocean {
+    background: var(--gradient-ocean);
+  }
+
+  .bg-gradient-sunset {
+    background: var(--gradient-sunset);
+  }
+
+  .bg-gradient-pearl {
+    background: var(--gradient-pearl);
+  }
+
+  .bg-gradient-cta {
+    background: var(--gradient-cta);
+  }
+
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .shadow-gold {
+    box-shadow: var(--shadow-gold);
+  }
+
+  /* Glass effect - Optimized */
+  .glass {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .glass-dark {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Animations Removed for Optimization */
+  .animate-wave {
+    /* animation removed */
+  }
+
+  .animate-float {
+    /* animation removed */
+  }
+
+  .animate-shimmer {
+    background: linear-gradient(90deg, transparent 0%, hsl(350 67% 34% / 0.1) 50%, transparent 100%);
+  }
+
+  .animate-pulse-gold {
+    box-shadow: 0 0 0 0 hsl(350 67% 34% / 0);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .animate-pulse-gold:hover {
+    box-shadow: 0 0 0 4px hsl(350 67% 34% / 0.2);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Legal pages styles */
+.legal-section {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid hsl(180 3% 90%);
+}
+.legal-section:last-child {
+  border-bottom: none;
+}
+.legal-h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: hsl(180 3% 25%);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+.legal-h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: hsl(180 3% 30%);
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.legal-text {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: hsl(180 3% 40%);
+  margin-bottom: 1rem;
+}
+.legal-list {
+  list-style: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+.legal-list li {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: hsl(180 3% 40%);
+  margin-bottom: 0.5rem;
+}
