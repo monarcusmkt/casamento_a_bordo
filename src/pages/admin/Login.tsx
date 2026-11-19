@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { supabase } from "../../lib/supabase";
+import { blogApi } from "../../lib/blogApi";
+import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,27 +12,24 @@ export default function AdminLogin() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { refresh } = useAuth();
     const { toast } = useToast();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
-        const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
-
-        if (error) {
+        try {
+            await blogApi.login(email,password);
+            await refresh();
+            navigate("/admin");
+        } catch (error) {
             toast({
                 variant: "destructive",
                 title: "Erro ao acessar",
                 description: "Credenciais inválidas. Verifique os dados digitados.",
             });
-            setLoading(false);
-        } else {
-            navigate("/admin");
-        }
+        } finally { setLoading(false); }
     };
 
     return (
