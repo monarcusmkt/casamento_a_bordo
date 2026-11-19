@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { supabase } from "../../lib/supabase";
+import { blogApi } from "../../lib/blogApi";
 import { Button } from "@/components/ui/button";
 import { LogOut, Plus, Edit, Trash2, Globe, FileText, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +18,7 @@ type Post = {
 };
 
 export default function AdminDashboard() {
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const navigate = useNavigate();
     const { toast } = useToast();
 
@@ -27,21 +27,9 @@ export default function AdminDashboard() {
 
     const fetchPosts = async () => {
         setLoading(true);
-        const { data, error } = await supabase
-            .from('posts')
-            .select('id, title, slug, published, created_at, updated_at')
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            toast({
-                variant: "destructive",
-                title: "Erro ao buscar posts",
-                description: error.message,
-            });
-        } else {
-            setPosts(data || []);
-        }
-        setLoading(false);
+        try { setPosts(await blogApi.list()); }
+        catch(error) { toast({variant:"destructive",title:"Erro ao buscar posts",description:String(error)}); }
+        finally {setLoading(false);}
     };
 
     useEffect(() => {
@@ -49,7 +37,8 @@ export default function AdminDashboard() {
     }, []);
 
     const handleSignOut = async () => {
-        await supabase.auth.signOut();
+        await logout();
+        navigate("/admin/login");
     };
 
     const handleDelete = async (id: string, title: string) => {
@@ -57,23 +46,8 @@ export default function AdminDashboard() {
             return;
         }
 
-        const { error } = await supabase
-            .from('posts')
-            .delete()
-            .eq('id', id);
-
-        if (error) {
-            toast({
-                variant: "destructive",
-                title: "Erro",
-                description: "Não foi possível deletar o post.",
-            });
-        } else {
-            toast({
-                title: "Post deletado com sucesso",
-            });
-            fetchPosts();
-        }
+        try { await blogApi.remove(id); toast({title:"Post deletado com sucesso"}); await fetchPosts(); }
+        catch(error) {toast({variant:"destructive",title:"Erro",description:String(error)});}
     };
 
     return (
