@@ -141,12 +141,12 @@ const app = async(req,res)=>{
  if(path==='/api/admin/users' && method==='POST'){
   if(user.role!=='master')return respond(res,403,{error:'Apenas Master'});
   const b=await parseBody(req),email=String(b.email||'').toLowerCase().trim(),password=String(b.password||'');
-  if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)||password.length<12||password.length>200)
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||password.length<12||password.length>200)
    return respond(res,400,{error:'E-mail inválido ou senha menor que 12 caracteres'});
   const {rows}=await pool.query('INSERT INTO admin_users(id,email,password_hash,role) VALUES($1,$2,$3,$4) RETURNING id,email,role',[randomUUID(),email,hashPassword(password),'admin']);
   return respond(res,201,rows[0]);
  }
- const userAction=path.match(/^\\/api\\/admin\\/users\\/([0-9a-f-]{36})\\/(reset-password|revoke)$/);
+ const userAction=path.match(/^\/api\/admin\/users\/([0-9a-f-]{36})\/(reset-password|revoke)$/);
  if(userAction && method==='POST'){
   if(user.role!=='master')return respond(res,403,{error:'Apenas Master'});
   const id=userAction[1];
