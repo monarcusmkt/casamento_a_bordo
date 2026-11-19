@@ -12,6 +12,7 @@ import { ProtectedLayout } from "./components/admin/ProtectedLayout";
 
 // Lazy Load Pages
 const AdminLogin = lazy(() => import("./pages/admin/Login"));
+const AdminUsers = lazy(() => import("./pages/admin/Users"));
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const NewPost = lazy(() => import("./pages/admin/NewPost"));
 const EditPost = lazy(() => import("./pages/admin/EditPost"));
@@ -46,6 +47,7 @@ const App = () => (
                 <Route path="/admin" element={<ProtectedLayout />}>
                   <Route index element={<AdminDashboard />} />
                   <Route path="posts" element={<AdminDashboard />} />
+                  <Route path="usuarios" element={<AdminUsers />} />
                   <Route path="novo-post" element={<NewPost />} />
                   <Route path="editar-post/:id" element={<EditPost />} />
                 </Route>
