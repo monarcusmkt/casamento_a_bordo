@@ -60,6 +60,7 @@ export default function AdminDashboard() {
                     </p>
                 </div>
                 <div className="flex items-center gap-4">
+                    {user?.role === 'master' && <Button variant="outline" onClick={() => navigate("/admin/usuarios")}>Administradores</Button>}
                     <Button onClick={() => navigate("/admin/novo-post")} className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
                         <Plus size={16} />
                         Escrever Artigo
