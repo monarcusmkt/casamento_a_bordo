@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../../lib/supabase";
+import { blogApi } from "../../lib/blogApi";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -24,13 +24,7 @@ export default function BlogList() {
 
     useEffect(() => {
         async function fetchPosts() {
-            const { data } = await supabase
-                .from('posts')
-                .select('id, title, slug, excerpt, cover_image, category, created_at')
-                .eq('published', true)
-                .order('created_at', { ascending: false });
-
-            setPosts(data || []);
+            try { setPosts((await blogApi.list()).filter(p=>p.published)); } catch {setPosts([]);}
             setLoading(false);
         }
         fetchPosts();
