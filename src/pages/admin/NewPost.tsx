@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../../lib/supabase";
+import { blogApi } from "../../lib/blogApi";
 import { useAuth } from "../../contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -77,40 +77,11 @@ export default function NewPost() {
         try {
             // 1. Upload Cover Image (if exists)
             if (coverImage) {
-                const fileExt = coverImage.name.split('.').pop();
-                const fileName = `${Math.random()}.${fileExt}`;
-                const filePath = `covers/${fileName}`;
-
-                const { error: uploadError, data: uploadData } = await supabase.storage
-                    .from('blog-images')
-                    .upload(filePath, coverImage);
-
-                if (uploadError) throw uploadError;
-
-                // Get public URL
-                const { data: { publicUrl } } = supabase.storage
-                    .from('blog-images')
-                    .getPublicUrl(filePath);
-
-                coverImageUrl = publicUrl;
+                coverImageUrl = await blogApi.upload(coverImage);
             }
 
             // 2. Insert Post Row
-            const { error: insertError } = await supabase
-                .from('posts')
-                .insert({
-                    title,
-                    slug,
-                    content,
-                    excerpt,
-                    cover_image: coverImageUrl,
-                    category,
-                    meta_title: metaTitle,
-                    meta_description: metaDescription,
-                    published,
-                });
-
-            if (insertError) throw insertError;
+            await blogApi.create({title,slug,content,excerpt,cover_image:coverImageUrl,category,meta_title:metaTitle,meta_description:metaDescription,published});
 
             toast({
                 title: "Sucesso!",
