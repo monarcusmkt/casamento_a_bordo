@@ -133,6 +133,33 @@ const app = async(req,res)=>{
   await pool.query('DELETE FROM admin_sessions WHERE token_hash=$1',[sha(token)]);
   return respond(res,200,{ok:true},{'Set-Cookie':'session=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0'});
  }
+ if(path==='/api/admin/users' && method==='GET'){
+  if(user.role!=='master')return respond(res,403,{error:'Apenas Master'});
+  const {rows}=await pool.query('SELECT id,email,role,created_at FROM admin_users ORDER BY created_at');
+  return respond(res,200,rows);
+ }
+ if(path==='/api/admin/users' && method==='POST'){
+  if(user.role!=='master')return respond(res,403,{error:'Apenas Master'});
+  const b=await parseBody(req),email=String(b.email||'').toLowerCase().trim(),password=String(b.password||'');
+  if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)||password.length<12||password.length>200)
+   return respond(res,400,{error:'E-mail inválido ou senha menor que 12 caracteres'});
+  const {rows}=await pool.query('INSERT INTO admin_users(id,email,password_hash,role) VALUES($1,$2,$3,$4) RETURNING id,email,role',[randomUUID(),email,hashPassword(password),'admin']);
+  return respond(res,201,rows[0]);
+ }
+ const userAction=path.match(/^\\/api\\/admin\\/users\\/([0-9a-f-]{36})\\/(reset-password|revoke)$/);
+ if(userAction && method==='POST'){
+  if(user.role!=='master')return respond(res,403,{error:'Apenas Master'});
+  const id=userAction[1];
+  const {rows}=await pool.query('SELECT role FROM admin_users WHERE id=$1',[id]);
+  if(!rows.length||rows[0].role!=='admin')return respond(res,403,{error:'Somente contas de administrador podem ser alteradas'});
+  if(userAction[2]==='reset-password'){
+   const b=await parseBody(req),password=String(b.password||'');
+   if(password.length<12||password.length>200)return respond(res,400,{error:'Senha inválida'});
+   await pool.query('UPDATE admin_users SET password_hash=$1 WHERE id=$2',[hashPassword(password),id]);
+  }
+  await pool.query('DELETE FROM admin_sessions WHERE user_id=$1',[id]);
+  return respond(res,200,{ok:true});
+ }
  if(method==='POST' && path==='/api/posts'){
   const f=postFields(await parseBody(req)),id=randomUUID();
   const {rows}=await pool.query(`INSERT INTO posts(id,title,slug,content,excerpt,cover_image,category,meta_title,meta_description,published)
