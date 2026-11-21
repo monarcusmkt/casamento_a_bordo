@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { supabase } from "../../lib/supabase";
+import { blogApi } from "../../lib/blogApi";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Loader2, ArrowLeft } from "lucide-react";
@@ -30,14 +30,7 @@ export default function BlogPost() {
     useEffect(() => {
         async function fetchPost() {
             if (!slug) return;
-            const { data } = await supabase
-                .from('posts')
-                .select('*')
-                .eq('slug', slug)
-                .eq('published', true)
-                .single();
-
-            setPost(data);
+            try {const data=await blogApi.get(slug);setPost(data.published?data:null);}catch{setPost(null);}
             setLoading(false);
         }
         fetchPost();

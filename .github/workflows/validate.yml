@@ -1,0 +1,56 @@
+name: Validate standalone blog
+on:
+  push:
+    branches: [feature/blog-proprio-postgres]
+  pull_request:
+    branches: [main]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: test-only-password
+          POSTGRES_DB: casamento_a_bordo
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Reconcile dependency lockfile
+        run: npm install --package-lock-only --ignore-scripts --legacy-peer-deps
+      - name: Install
+        run: npm ci --legacy-peer-deps
+      - name: TypeScript
+        run: npx tsc --noEmit -p tsconfig.app.json
+      - name: Build
+        run: npm run build
+      - name: Unit tests
+        run: npm test -- --run
+      - name: Node syntax
+        run: node --check server/index.mjs
+      - name: API smoke test
+        env:
+          DATABASE_URL: postgres://postgres:test-only-password@localhost:5432/casamento_a_bordo
+          MASTER_EMAIL: master@example.test
+          MASTER_PASSWORD: test-master-password-123
+          ADMIN_EMAIL: admin@example.test
+          ADMIN_PASSWORD: test-admin-password-123
+          PORT: 3000
+          UPLOADS_DIR: ${{ runner.temp }}/casamento-a-bordo-uploads
+        run: |
+          node server/index.mjs > /tmp/server.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:3000/api/auth/me >/tmp/session.json; then break; fi
+            sleep 2
+          done
+          cat /tmp/server.log
+          curl -fsS http://localhost:3000/api/auth/me
+      - name: Docker build
+        run: docker build -t casamento-a-bordo:ci .
