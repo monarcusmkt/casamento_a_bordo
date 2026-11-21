@@ -43,6 +43,7 @@ jobs:
           ADMIN_EMAIL: admin@example.test
           ADMIN_PASSWORD: test-admin-password-123
           PORT: 3000
+          UPLOADS_DIR: ${{ runner.temp }}/casamento-a-bordo-uploads
         run: |
           node server/index.mjs > /tmp/server.log 2>&1 &
           for i in $(seq 1 30); do
