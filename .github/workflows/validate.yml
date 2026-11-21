@@ -24,9 +24,9 @@ jobs:
         with:
           node-version: '24'
       - name: Reconcile dependency lockfile
-        run: npm install --package-lock-only --ignore-scripts
+        run: npm install --package-lock-only --ignore-scripts --legacy-peer-deps
       - name: Install
-        run: npm ci
+        run: npm ci --legacy-peer-deps
       - name: TypeScript
         run: npx tsc --noEmit -p tsconfig.app.json
       - name: Build
