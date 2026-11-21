@@ -9,7 +9,7 @@ import sanitizeHtml from 'sanitize-html';
 const { Pool } = pg;
 if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL obrigatória');
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 5 });
-const root = resolve('/app/dist'), uploads = resolve('/data/uploads');
+const root = resolve(process.env.STATIC_DIR || '/app/dist'), uploads = resolve(process.env.UPLOADS_DIR || '/data/uploads');
 const port = Number(process.env.PORT || 80);
 const sessionsHours = 12;
 const hashPassword = (password) => {
