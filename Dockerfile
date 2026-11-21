@@ -7,12 +7,14 @@ RUN npm install --package-lock-only --ignore-scripts --legacy-peer-deps \
     && npm ci --legacy-peer-deps
 COPY . .
 RUN npm run build
+# Prune dependencies from the reconciled installation; avoid a second npm ci against the stale lockfile.
+RUN npm prune --omit=dev --legacy-peer-deps && npm cache clean --force
 
 FROM node:24-alpine
 ENV NODE_ENV=production PORT=80
 WORKDIR /app
 COPY --from=build /app/package*.json ./
-RUN npm ci --omit=dev --legacy-peer-deps && npm cache clean --force
+COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY server ./server
 RUN mkdir -p /data/uploads && chown -R node:node /app /data/uploads
