@@ -17,7 +17,7 @@ export function HeroSection() {
           alt="Casamento a bordo de navio"
           className="w-full h-full object-cover"
           loading="eager"
-          fetchpriority="high"
+          fetchPriority="high"
         />
         <div
           className="absolute inset-0 bg-black/50"
